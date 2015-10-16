@@ -18,7 +18,6 @@ public class MainActivity extends Activity implements AMapLocationListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		init();
 	}
 	
 	/**
@@ -34,7 +33,7 @@ public class MainActivity extends Activity implements AMapLocationListener{
 		// 其中如果间隔时间为-1，则定位只定一次,
 		// 在单次定位情况下，定位无论成功与否，都无需调用removeUpdates()方法移除请求，定位sdk内部会移除
 		mLocationManagerProxy.requestLocationData(
-				LocationProviderProxy.AMapNetwork, 60 * 1000, 15, this);
+				LocationProviderProxy.AMapNetwork, 10 * 1000, 15, this);
 
 	}
 	
@@ -68,5 +67,18 @@ public class MainActivity extends Activity implements AMapLocationListener{
 			Log.e(TAG,"amapLocation==null");
 		}
 
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// 移除定位请求
+		mLocationManagerProxy.removeUpdates(this);
+		// 销毁定位
+		mLocationManagerProxy.destroy();
+	}
+	@Override
+	protected void onStart(){
+		super.onStart();
+		init();
 	}
 }
