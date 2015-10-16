@@ -4,6 +4,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
+import com.amap.api.maps.MapView;
 
 import android.app.Activity;
 import android.location.Location;
@@ -13,11 +14,14 @@ import android.util.Log;
 public class MainActivity extends Activity implements AMapLocationListener{
 	private LocationManagerProxy mLocationManagerProxy;
 	private String TAG = "MainActivity";
+	private MapView mapView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		mapView = (MapView) findViewById(R.id.map);
+		mapView.onCreate(savedInstanceState);// 此方法必须重写
 	}
 	
 	/**
@@ -61,12 +65,12 @@ public class MainActivity extends Activity implements AMapLocationListener{
 	public void onLocationChanged(AMapLocation amapLocation) {
 		if (amapLocation != null
 				&& amapLocation.getAMapException().getErrorCode() == 0) {
-			Log.i(TAG,"="+amapLocation.getLatitude() + "  "
-			+ amapLocation.getLongitude());
+			Log.i(TAG,"经度="+amapLocation.getLatitude());
+			Log.i(TAG,"纬度="+amapLocation.getLongitude());
+			Log.i(TAG,"地点="+amapLocation.getAddress());
 		}else{
 			Log.e(TAG,"amapLocation==null");
 		}
-
 	}
 	@Override
 	protected void onPause() {
