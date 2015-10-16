@@ -3,11 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-    
     <com.amap.api.maps.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
     </com.amap.api.maps.MapView>
-
+    
+    <TextView
+        android:id="@+id/tv_information"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="相关信息" 
+        android:textSize="15dp"
+        android:scrollbars = "vertical"
+        android:background="#FFFFFF"/>
+    
+    
 </RelativeLayout>
