@@ -8,15 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
     </com.amap.api.maps.MapView>
-    
-    <TextView
-        android:id="@+id/tv_information"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="相关信息" 
-        android:textSize="15dp"
-        android:scrollbars = "vertical"
-        android:background="#FFFFFF"/>
+    <Button
+            android:id="@+id/btn_intent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="跳转" />
     
     
 </RelativeLayout>

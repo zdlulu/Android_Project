@@ -27,7 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.example.message.MessageShowActivity"></activity>
     </application>
+    
     
     
     <uses-permission android:name="android.permission.INTERNET" />

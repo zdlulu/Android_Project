@@ -1,5 +1,8 @@
 package com.example.android_map_location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.amap.api.location.AMapLocalWeatherForecast;
 import com.amap.api.location.AMapLocalWeatherListener;
 import com.amap.api.location.AMapLocalWeatherLive;
@@ -10,16 +13,27 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
+import com.amap.api.services.core.PoiItem;
+import com.amap.api.services.poisearch.PoiItemDetail;
+import com.amap.api.services.poisearch.PoiResult;
+import com.amap.api.services.poisearch.PoiSearch;
+import com.amap.api.services.poisearch.PoiSearch.OnPoiSearchListener;
+import com.amap.api.services.poisearch.PoiSearch.Query;
+import com.example.message.Common;
+import com.example.message.MessageShowActivity;
 import android.app.Activity;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements 
-	AMapLocationListener,LocationSource,AMapLocalWeatherListener{
+	AMapLocationListener,LocationSource,AMapLocalWeatherListener, OnPoiSearchListener{
 	
 	private LocationManagerProxy mLocationManagerProxy;
 	private String TAG = "MainActivity";
@@ -27,8 +41,11 @@ public class MainActivity extends Activity implements
     MapView mapView;
 	private AMap aMap;
 	private LocationManagerProxy mAMapLocationManager;
-	private TextView tv_information;
 	private String str_information="";
+	private PoiSearch search;
+	private PoiSearch.Query query;
+	private Button btn_intent;
+	private Common common= new Common();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +54,24 @@ public class MainActivity extends Activity implements
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
+		
 	}
 	
 	/**
 	 * 初始化定位
 	 */
 	private void init() {
+		btn_intent = (Button) findViewById(R.id.btn_intent);
+		btn_intent.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this,MessageShowActivity.class);
+				startActivityForResult(intent, 1);
+			}
+			
+		});
 		// 初始化定位，只采用网络定位
-		tv_information = (TextView) findViewById(R.id.tv_information);
-		tv_information.setMovementMethod(new ScrollingMovementMethod());
 		mLocationManagerProxy = LocationManagerProxy.getInstance(this);
 		mLocationManagerProxy.setGpsEnable(false);
 		// 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
@@ -96,9 +122,9 @@ public class MainActivity extends Activity implements
 			}else{
 				Log.i(TAG,"mListener==null");
 			}
-			set_information("经度="+String.valueOf(amapLocation.getLatitude()));
-			set_information("纬度="+String.valueOf(amapLocation.getLongitude()));
-			set_information("地点="+amapLocation.getAddress());
+			common.set_string("经度="+String.valueOf(amapLocation.getLatitude()));
+			common.set_string("纬度="+String.valueOf(amapLocation.getLongitude()));
+			common.set_string("地点="+amapLocation.getAddress());
 			Log.i(TAG,"经度="+amapLocation.getLatitude());
 			Log.i(TAG,"纬度="+amapLocation.getLongitude());
 			Log.i(TAG,"地点="+amapLocation.getAddress());
@@ -186,6 +212,7 @@ public class MainActivity extends Activity implements
 			Log.i(TAG,"风力="+aMapLocalWeatherLive.getWindPower()+"级");
 			Log.i(TAG,"湿度="+aMapLocalWeatherLive.getHumidity()+"%");
 			Log.i(TAG,"时间="+aMapLocalWeatherLive.getReportTime());
+			search("中山");
 		} else {
 			// 获取天气预报失败
 			Log.i(TAG,"onWeatherLiveSearched else");
@@ -200,11 +227,37 @@ public class MainActivity extends Activity implements
 		
 	}
 	/*AMapLocalWeatherListener************************************/
-	int i=1;
-	public void set_information(String s){
-		str_information = str_information+s+"\n";
-		tv_information.setText(str_information);
-		tv_information.setMaxLines(i++);
+	/*************************************************************/
+	public void search(String keyword){
+		query = new Query(keyword, null, "天津市");  
+		query.setPageSize(20);  
+	    query.setPageNum(1);  
+	    // 查询兴趣点  
+	    search = new PoiSearch(this, query);  
+	    // 异步搜索  
+	    search.searchPOIAsyn();  
+	    search.setOnPoiSearchListener(this); 
 	}
+
+	@Override
+	public void onPoiItemDetailSearched(PoiItemDetail arg0, int arg1) {
+		
+	}
+	
+	ArrayList<PoiItem> items = new ArrayList<PoiItem>();
+	@Override
+	public void onPoiSearched(PoiResult poiResult, int rCode) {
+		List<String> strs = new ArrayList<String>();
+		items = poiResult.getPois();
+		Log.i("="+items.size(), "201510");
+		if (items != null && items.size() > 0) {
+			PoiItem item = null;
+			for (int i = 0, count = items.size(); i < count; i++) {
+				item = items.get(i);
+				strs.add(item.getTitle());
+//				Log.i("="+item.getTitle(), "201510");
+				}
+			}
+		}
 	/*************************************************************/
 }
