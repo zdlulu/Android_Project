@@ -13,12 +13,14 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
+import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiItemDetail;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
 import com.amap.api.services.poisearch.PoiSearch.OnPoiSearchListener;
 import com.amap.api.services.poisearch.PoiSearch.Query;
+import com.amap.api.services.poisearch.PoiSearch.SearchBound;
 import com.example.message.Common;
 import com.example.message.MessageShowActivity;
 import android.app.Activity;
@@ -55,6 +57,7 @@ public class MainActivity extends Activity implements
 	private Button btn_intent;
 	private ListView mLvResult;
 	private EditText et_start;
+	private double geoLat,geoLng;
 	private Common common= new Common();
 	
 	@Override
@@ -138,6 +141,8 @@ public class MainActivity extends Activity implements
 			}else{
 				Log.i(TAG,"mListener==null");
 			}
+			geoLat = amapLocation.getLatitude();
+			geoLng = amapLocation.getLongitude();
 			common.set_string("经度="+String.valueOf(amapLocation.getLatitude()));
 			common.set_string("纬度="+String.valueOf(amapLocation.getLongitude()));
 			common.set_string("地点="+amapLocation.getAddress());
@@ -228,7 +233,6 @@ public class MainActivity extends Activity implements
 			Log.i(TAG,"风力="+aMapLocalWeatherLive.getWindPower()+"级");
 			Log.i(TAG,"湿度="+aMapLocalWeatherLive.getHumidity()+"%");
 			Log.i(TAG,"时间="+aMapLocalWeatherLive.getReportTime());
-//			search("中山路");
 		} else {
 			// 获取天气预报失败
 			Log.i(TAG,"onWeatherLiveSearched else");
@@ -252,6 +256,7 @@ public class MainActivity extends Activity implements
 	    // 异步搜索  
 	    search.searchPOIAsyn();  
 	    search.setOnPoiSearchListener(this); 
+//	    search.setBound(new SearchBound(new LatLonPoint(geoLat, geoLng),5000));
 	}
 
 	@Override
@@ -264,7 +269,7 @@ public class MainActivity extends Activity implements
 	public void onPoiSearched(PoiResult poiResult, int rCode) {
 		List<String> strs = new ArrayList<String>();
 		items = poiResult.getPois();
-		Log.i("="+items.size(), "201510");
+//		Log.i("="+items.size(), "201510");
 		if (items != null && items.size() > 0) {
 			PoiItem item = null;
 			for (int i = 0, count = items.size(); i < count; i++) {
@@ -291,18 +296,24 @@ public class MainActivity extends Activity implements
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
-//			Log.i("TAG","beforeTextChanged--------------->");  
+//			Log.i(TAG,"beforeTextChanged--------------->");  
 		}
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
-//			Log.i("TAG","onTextChanged--------------->");    
+//			Log.i(TAG,"onTextChanged--------------->");    
             str = et_start.getText().toString();  
-            search(str);
+            
 		}
 		@Override
 		public void afterTextChanged(Editable s) {
-//			Log.i("TAG","afterTextChanged--------------->");   
+//			Log.i(TAG,"afterTextChanged--------------->"); 
+			if(!str.equals("")){
+            	search(str);
+            }else{
+            	mLvResult.setAdapter(null);  
+            }
+			
 		}
 	};
 	/*************************************************************/
