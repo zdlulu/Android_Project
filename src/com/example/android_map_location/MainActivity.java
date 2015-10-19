@@ -25,15 +25,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements 
-	AMapLocationListener,LocationSource,AMapLocalWeatherListener, OnPoiSearchListener{
+	AMapLocationListener,LocationSource,AMapLocalWeatherListener,
+	OnPoiSearchListener, OnItemClickListener {
 	
 	private LocationManagerProxy mLocationManagerProxy;
 	private String TAG = "MainActivity";
@@ -41,10 +49,12 @@ public class MainActivity extends Activity implements
     MapView mapView;
 	private AMap aMap;
 	private LocationManagerProxy mAMapLocationManager;
-	private String str_information="";
+	private String str="";
 	private PoiSearch search;
 	private PoiSearch.Query query;
 	private Button btn_intent;
+	private ListView mLvResult;
+	private EditText et_start;
 	private Common common= new Common();
 	
 	@Override
@@ -53,15 +63,21 @@ public class MainActivity extends Activity implements
 		setContentView(R.layout.main);
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
-		
-		
+
 	}
-	
+	/*******************************************************/ 
+	public void init_widget(){
+		btn_intent = (Button) findViewById(R.id.btn_intent);
+		mLvResult = (ListView) findViewById(R.id.lv_result);  
+		mLvResult.setOnItemClickListener(this);  
+		et_start = (EditText) findViewById(R.id.et_start);
+		et_start.addTextChangedListener(textWatcher);  
+	}
 	/**
 	 * 初始化定位
 	 */
 	private void init() {
-		btn_intent = (Button) findViewById(R.id.btn_intent);
+		init_widget();
 		btn_intent.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -92,7 +108,7 @@ public class MainActivity extends Activity implements
 				LocationManagerProxy.WEATHER_TYPE_LIVE, this);
 
 	}
-	
+	/*******************************************************/ 
 	@Override
 	public void onLocationChanged(Location location) {
 		
@@ -102,7 +118,7 @@ public class MainActivity extends Activity implements
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		
 	}
-
+	/*******************************************************/ 
 	@Override
 	public void onProviderEnabled(String provider) {
 		
@@ -132,6 +148,7 @@ public class MainActivity extends Activity implements
 			Log.e(TAG,"amapLocation==null");
 		}
 	}
+	/*******************************************************/ 
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -155,7 +172,7 @@ public class MainActivity extends Activity implements
 		super.onSaveInstanceState(outState);
 		mapView.onSaveInstanceState(outState);
 	}
-	
+	/*******************************************************/ 
 	/**
 	 * 设置一些amap的属性
 	 */
@@ -194,7 +211,6 @@ public class MainActivity extends Activity implements
 		mAMapLocationManager = null;
 		
 	}
-	/*LocationSource*************************************************/
 	
 	/*AMapLocalWeatherListener************************************/
 	@Override
@@ -212,7 +228,7 @@ public class MainActivity extends Activity implements
 			Log.i(TAG,"风力="+aMapLocalWeatherLive.getWindPower()+"级");
 			Log.i(TAG,"湿度="+aMapLocalWeatherLive.getHumidity()+"%");
 			Log.i(TAG,"时间="+aMapLocalWeatherLive.getReportTime());
-			search("中山");
+//			search("中山路");
 		} else {
 			// 获取天气预报失败
 			Log.i(TAG,"onWeatherLiveSearched else");
@@ -226,11 +242,10 @@ public class MainActivity extends Activity implements
 		}
 		
 	}
-	/*AMapLocalWeatherListener************************************/
 	/*************************************************************/
 	public void search(String keyword){
 		query = new Query(keyword, null, "天津市");  
-		query.setPageSize(20);  
+		query.setPageSize(10);  
 	    query.setPageNum(1);  
 	    // 查询兴趣点  
 	    search = new PoiSearch(this, query);  
@@ -256,8 +271,41 @@ public class MainActivity extends Activity implements
 				item = items.get(i);
 				strs.add(item.getTitle());
 //				Log.i("="+item.getTitle(), "201510");
-				}
 			}
+			ArrayAdapter<String> array = new ArrayAdapter<String>(this,  
+	                android.R.layout.simple_list_item_1, strs);  
+	        mLvResult.setAdapter(array);  
 		}
+	}
+	/*************************************************************/
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		
+	}
+	/*对editText的监听************************************************************/
+	private TextWatcher textWatcher = new TextWatcher() {
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+//			Log.i("TAG","beforeTextChanged--------------->");  
+		}
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+//			Log.i("TAG","onTextChanged--------------->");    
+            str = et_start.getText().toString();  
+            search(str);
+		}
+		@Override
+		public void afterTextChanged(Editable s) {
+//			Log.i("TAG","afterTextChanged--------------->");   
+		}
+	};
+	/*************************************************************/
+	/*************************************************************/
+	/*************************************************************/
 	/*************************************************************/
 }
