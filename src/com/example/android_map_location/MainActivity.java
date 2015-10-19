@@ -277,12 +277,13 @@ public class MainActivity extends Activity implements
 	        mLvResult.setAdapter(array);  
 		}
 	}
-	/*************************************************************/
-
+	/*listview点击获取某一条的内容***************************************************/
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		
+		String listview_str = (String) ((TextView) view).getText();
+		et_start.setText(listview_str);
+		mLvResult.setAdapter(null);  
 	}
 	/*对editText的监听************************************************************/
 	private TextWatcher textWatcher = new TextWatcher() {
