@@ -11,6 +11,7 @@ import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.services.core.LatLonPoint;
@@ -182,6 +183,10 @@ public class MainActivity extends Activity implements
 	 * 设置一些amap的属性
 	 */
 	private void setUpMap() {
+		//设置地图的缩放级别
+		aMap.moveCamera(CameraUpdateFactory.zoomTo(13));
+		//获取地图的缩放级别
+		float mZoom = aMap.getCameraPosition().zoom;
 		aMap.setLocationSource(this);// 设置定位监听
 		aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
 		aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
@@ -253,10 +258,11 @@ public class MainActivity extends Activity implements
 	    query.setPageNum(1);  
 	    // 查询兴趣点  
 	    search = new PoiSearch(this, query);  
+	    //以经纬度(geoLat，geoLng)为中心搜索5公里范围内的区域
+//	    search.setBound(new SearchBound(new LatLonPoint(geoLat, geoLng),5000));
 	    // 异步搜索  
 	    search.searchPOIAsyn();  
 	    search.setOnPoiSearchListener(this); 
-//	    search.setBound(new SearchBound(new LatLonPoint(geoLat, geoLng),5000));
 	}
 
 	@Override
@@ -269,7 +275,7 @@ public class MainActivity extends Activity implements
 	public void onPoiSearched(PoiResult poiResult, int rCode) {
 		List<String> strs = new ArrayList<String>();
 		items = poiResult.getPois();
-//		Log.i("="+items.size(), "201510");
+//		Log.i("items="+items.size(), "201510");
 		if (items != null && items.size() > 0) {
 			PoiItem item = null;
 			for (int i = 0, count = items.size(); i < count; i++) {
@@ -313,7 +319,6 @@ public class MainActivity extends Activity implements
             }else{
             	mLvResult.setAdapter(null);  
             }
-			
 		}
 	};
 	/*************************************************************/
